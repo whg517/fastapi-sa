@@ -14,36 +14,64 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04]
-        python: ["3.10"]
+        os: [ ubuntu-latest ]
+        python: [ "3.10" ]
 
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Install libxml2 and libxslt
-        run: sudo apt-get install libxml2-dev libxslt-dev python-dev
-
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Set up Python ${{ matrix.python }} on ${{ matrix.os }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install tox
-
       - name: Test with tox
         run: |
           tox -e py
-
   linting:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v2
-
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
       - run: pip install tox
       - run: |
           tox -e isort
-          tox -e lint
+          tox -e pylint
+
+  deploy:
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags') && github.repository == 'whg517/fastapi-sa'
+
+    runs-on: ubuntu-latest
+
+    needs:
+      - test
+      - linting
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade poetry
+      - name: Build package
+        run: |
+          poetry build
+      - name: Publish a Python distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{secrets.PYPI_API_TOKEN}}
