@@ -43,7 +43,7 @@ from fastapi_sa.middleware import DBSessionMiddleware
 from models import Item
 
 app = FastAPI()
-db.init(url="sqlite://")
+db.init(url="sqlite+aiosqlite://")
 app.add_middleware(DBSessionMiddleware)
 
 
@@ -63,7 +63,7 @@ from fastapi_sa.database import db, session_ctx
 
 from models import Item
 
-db.init(url="sqlite://")
+db.init(url="sqlite+aiosqlite://")
 
 
 @session_ctx
@@ -81,6 +81,7 @@ asyncio.run(add_data('item_test'))
 - [FastAPI-SQLAlchemy](https://github.com/mfreeborn/fastapi-sqlalchemy)
 
 ## Based on
+
 - [FastAPI](https://github.com/tiangolo/fastapi)
 - [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy)
 
