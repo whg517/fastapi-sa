@@ -7,7 +7,7 @@ from typing import cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm  # pylint: disable=unused-import
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from fastapi_sa.exceptions import SQLAlchemyNotInitError
 

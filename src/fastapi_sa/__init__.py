@@ -1,2 +1,2 @@
-"""fastapi-sqlalchemy"""
+"""fastapi-sa"""
 __version__ = '0.0.1.dev0'
