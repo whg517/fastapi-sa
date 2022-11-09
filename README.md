@@ -1,5 +1,7 @@
 # fastapi-sa
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7972e284d39745f497e85054e798d054)](https://app.codacy.com/gh/whg517/fastapi-sa?utm_source=github.com&utm_medium=referral&utm_content=whg517/fastapi-sa&utm_campaign=Badge_Grade_Settings)
+
 ![GitHub](https://img.shields.io/github/license/whg517/aio-pydispatch?style=flat-square)
 ![PyPI](https://img.shields.io/pypi/v/0.0.1?color=blue&label=pypi&logo=fastapi_sa)
 
