@@ -1,6 +1,7 @@
 """
 database
 """
+import contextlib
 import contextvars
 import logging
 from typing import cast
@@ -97,41 +98,29 @@ class Database(metaclass=SingleMeta):
             _session = self.session_maker()
         return _session
 
-    def __call__(self, **session_args):
-        return _Session(self, session_args)
+    def set_session_ctx(self):
+        """set new session to ctx"""
+        assert self.session_maker
+        session = self.session_maker()
+        session = cast(AsyncSession, session)
+        logger.debug('Init context session, session: %s', session)
+        token = self.session_ctx.set(session)
+        logger.debug('Set session %s to context var, context var token: %s', session, token)
+        return token
 
+    def reset_session_ctx(self, token):
+        """reset session ctx by token """
+        self.session_ctx.reset(token)
 
-class _Session:
-    def __init__(self, sa_db, session_args):
-        self._sa_db = sa_db
-        self._session_args = session_args
-        self.__session_ctx_token = None
-
-    async def __aenter__(self):
-        """"""
-        assert self._sa_db.session_maker
-        _session = self._sa_db.session_maker(**self._session_args)
-        _session = cast(AsyncSession, _session)
-        logger.debug('Init context session, session id: %d', id(_session))
-        self.__session_ctx_token = self._sa_db.session_ctx.set(_session)
-        logger.debug(
-            'Set session %d to context var, context var token: %s',
-            id(_session), self.__session_ctx_token
-        )
-        return _session
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        _session = self._sa_db.session_ctx.get()
-        if exc_type is not None:
-            await _session.rollback()
-        session_id = id(_session)
-        await _session.commit()
-        await _session.close()
-        self._sa_db.session_ctx.reset(self.__session_ctx_token)
-        logger.debug(
-            'Reset context var token %s, and session id: %d',
-            self.__session_ctx_token, id(session_id)
-        )
+    @contextlib.asynccontextmanager
+    async def __call__(self, *args, **kwargs):
+        token = self.set_session_ctx()
+        session = self.__session_ctx.get()
+        async with session.begin():
+            yield session
+        await session.close()
+        self.reset_session_ctx(token)
+        logger.debug('Reset session context var token: %s , session : %s', token, session)
 
 
 db = Database()
