@@ -1,7 +1,10 @@
 # fastapi-sa
 
-![GitHub](https://img.shields.io/github/license/whg517/aio-pydispatch?style=flat-square)
-![PyPI](https://img.shields.io/pypi/v/0.0.1?color=blue&label=pypi&logo=fastapi_sa)
+![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/whg517/fastapi-sa/main/main?style=flat-square)
+![GitHub](https://img.shields.io/github/license/whg517/fastapi-sa?style=flat-square)
+![Python](https://img.shields.io/pypi/pyversions/fastapi-sa)
+![PyPI](https://img.shields.io/pypi/v/fastapi-sa?style=flat-square)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/c76cfa7d7d274f899967019900465403)](https://www.codacy.com/gh/whg517/fastapi-sa/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=whg517/fastapi-sa&amp;utm_campaign=Badge_Grade)
 
 fastapi-sa provides a simple integration between FastAPI and SQLAlchemy in your application.
 you can use decorators or middleware to transaction management.
@@ -19,61 +22,163 @@ $ pip install fastapi-sa
 ### Create models for examples, `models.py`
 
 ```python
+from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
 
-class Item(Base):
-    """ItemModel"""
-    __tablename__ = 'item'
+class User(Base):
+    """UserModel"""
+    __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
+    age = Column(Integer)
 
+
+class UserSchema(BaseModel):
+    """user schema"""
+    id: int
+    name: str
+    age: int
+
+    class Config:
+        """config"""
+        orm_mode = True
 ```
 
-### Usage fastapi middleware
+### Database migrations for examples
+
+code for create tables, also you can use database migrations.
+
+```python
+from sqlalchemy import create_engine
+from models import Base
+
+engine = create_engine('sqlite+aiosqlite:////tmp/test.db')
+Base.metadata.create_all(engine) 
+```
+
+### DB init for examples
+
+```python
+from fastapi_sa.database import db
+
+db.init(url='sqlite+aiosqlite:////tmp/test.db')
+```
+
+### Usage 1: fastapi middleware
 
 ```python
 from fastapi import FastAPI
+from sqlalchemy import select
+
 from fastapi_sa.database import db
 from fastapi_sa.middleware import DBSessionMiddleware
-
-from models import Item
+from tests.example.db import User, UserSchema
 
 app = FastAPI()
-db.init(url="sqlite+aiosqlite://")
 app.add_middleware(DBSessionMiddleware)
 
 
-@app.put("/items")
-async def get_users(name: str):
-    async with db() as session:
-        item = Item(name=name)
-        session.add(item)
-    return {'msg': 'ok'}
+@app.get('/users')
+async def get_users():
+    """get all users"""
+    result = await db.session.scalars(select(User))
+    objs = [UserSchema.from_orm(i) for i in result.all()]
+    return objs
 ```
 
-### Usage other asynchronous database operations
+### Usage 2: other asynchronous database operations
 
 ```python
-import asyncio
+from sqlalchemy import select
+
 from fastapi_sa.database import db, session_ctx
-
-from models import Item
-
-db.init(url="sqlite+aiosqlite://")
+from tests.example.db import User, UserSchema
 
 
 @session_ctx
-async def add_data(name: str):
-    async with db() as session:
-        item = Item(name=name)
-        session.add(item)
+async def get_users():
+    """get users"""
+    results = await db.session.scalars(select(User))
+    objs = [UserSchema.from_orm(i) for i in results.all()]
+    return objs
+```
+
+### Usage 3: with fixtures in pytest
+
+```python
+import pytest
+from fastapi_sa.database import db
 
 
-asyncio.run(add_data('item_test'))
+@pytest.fixture()
+def db_session_ctx():
+    """db session context"""
+    token = db.set_session_ctx()
+    yield
+    db.reset_session_ctx(token)
+
+
+@pytest.fixture()
+async def session(db_session_ctx):
+    """session fixture"""
+    async with db.session.begin():
+        yield db.session
+```
+
+If you initialize data in fixture, please use
+
+```python
+from fastapi_sa.database import db
+from models import User
+
+async with db():
+    users = User(name='aoo', age=12)
+    db.session.add(users)
+    await db.session.flush()
+```
+
+if you test class methods, please use
+
+```python
+import pytest
+from sqlalchemy import func, select
+from models import User, UserSchema
+from fastapi_sa.database import db
+
+
+class UserRepository:
+    """user repository"""
+
+    @property
+    def model(self):
+        """model"""
+        return User
+
+    async def get_all(self):
+        """get all"""
+        result = await db.session.scalars(select(self.model))
+        objs = [UserSchema.from_orm(i) for i in result.all()]
+        return objs
+
+
+# the test case is as follows    
+
+@pytest.fixture()
+def repo():
+    """repo"""
+    return UserRepository()
+
+
+@pytest.mark.asyncio
+async def test_get_all(session, init_user, repo):
+    """test get all"""
+    objs = await repo.get_all()
+    length = await session.scalar(select(func.count()).select_from(User))
+    assert len(objs) == length
 ```
 
 ## Similar design
@@ -88,4 +193,3 @@ asyncio.run(add_data('item_test'))
 ## Develop
 
 You may need to read the [develop document](./docs/development.md) to use SRC Layout in your IDE.
-
