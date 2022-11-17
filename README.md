@@ -5,6 +5,7 @@
 ![Python](https://img.shields.io/pypi/pyversions/fastapi-sa)
 ![PyPI](https://img.shields.io/pypi/v/fastapi-sa?style=flat-square)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/c76cfa7d7d274f899967019900465403)](https://www.codacy.com/gh/whg517/fastapi-sa/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=whg517/fastapi-sa&amp;utm_campaign=Badge_Grade)
+[![codecov](https://codecov.io/gh/whg517/fastapi-sa/branch/main/graph/badge.svg?token=F098K6GGGC)](https://codecov.io/gh/whg517/fastapi-sa)
 
 fastapi-sa provides a simple integration between FastAPI and SQLAlchemy in your application.
 you can use decorators or middleware to transaction management.
@@ -14,7 +15,7 @@ you can use decorators or middleware to transaction management.
 install and update using pip:
 
 ```shell
-$ pip install fastapi-sa
+pip install fastapi-sa
 ```
 
 ## Examples

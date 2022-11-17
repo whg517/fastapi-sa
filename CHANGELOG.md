@@ -12,8 +12,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- refactory database.py `__call__` context management with decorator.
-- change starlette = ">=0.20.14" to starlette = ">=0.19.1".
+- fix ContextVar not propagated from fixture to test.
+- change `starlette = ">=0.20.14"` to `starlette = ">=0.19.1"`.
 
 ### Removed
 
