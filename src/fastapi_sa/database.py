@@ -46,23 +46,34 @@ class Database(metaclass=SingleMeta):
     def init(
             self,
             url: str,
-            echo: bool = False
+            echo: bool = False,
+            engine_kw: dict = None,
+            session_maker_kw: dict = None,
     ):
         """
-
+        inti db
         :param url:
         :param echo:
+        :param engine_kw:
+        :param session_maker_kw:
         :return:
         """
+
+        if engine_kw is None:
+            engine_kw = {}
+        if session_maker_kw is None:
+            session_maker_kw = {}
         self.__engine = create_async_engine(
             url,
             echo=echo,
             future=True,
+            **engine_kw
         )
         self.__session_maker = sa.orm.sessionmaker(
             self.engine,
             class_=sa.ext.asyncio.session.AsyncSession,
             # expire_on_commit=False,  # 取消提交后过期操作，此现象会产生缓存，请注意清理。
+            **session_maker_kw
         )
 
     @property
