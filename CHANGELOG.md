@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.0.dev1] - 2022-11-17
+## [0.1.0] - 2023-02-23
+
+### Added
+
+- db init parameters
+
+## [0.0.1.dev1] - 2022-11-17
 
 ### Added
 
