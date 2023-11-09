@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-sa"
-version = "0.1.0"
+version = "0.2.0"
 description = "fastapi-sa provides a simple integration between FastAPI and SQLAlchemy in your application"
 readme = "README.md"
 authors = ["huagang <huagang517@126.com>"]
