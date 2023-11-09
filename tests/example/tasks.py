@@ -9,7 +9,7 @@ from tests.example.db import User, UserSchema
 async def task_get_users():
     """get users"""
     results = await db.session.scalars(select(User))
-    objs = [UserSchema.from_orm(i) for i in results.all()]
+    objs = [UserSchema.model_validate(i) for i in results.all()]
     return objs
 
 
@@ -17,7 +17,7 @@ async def task_get_users():
 async def task_get_user_by_id(pk: int):
     """get users"""
     result = await db.session.scalar(select(User).where(User.id == pk))
-    return UserSchema.from_orm(result)
+    return UserSchema.model_validate(result)
 
 
 @session_ctx
@@ -26,4 +26,4 @@ async def task_create_user(name: str, age: int):
     obj = User(name=name, age=age)
     db.session.add(obj)
     await db.session.flush()
-    return UserSchema.from_orm(obj)
+    return UserSchema.model_validate(obj)

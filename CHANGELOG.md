@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] 2023-11-09
+
+### Changed
+
+- broken change: update deps `sqlalchemy: 2.0.23`
+
+### Others
+
+- add `py311` support and test pass
+- update badges
+
 ## [0.1.0] - 2023-02-23
 
 ### Added

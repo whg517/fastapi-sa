@@ -1,11 +1,11 @@
 # fastapi-sa
 
-![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/whg517/fastapi-sa/main/main?style=flat-square)
+[![GitHub Workflow Status (branch)](https://github.com/crawlerstack/fastapi-sa/workflows/main/badge.svg?event=push&branch=main)](https://github.com/crawlerstack/fastapi-sa/actions?query=workflow%3Amain+event%3Apush+branch%3Amain)
 ![GitHub](https://img.shields.io/github/license/whg517/fastapi-sa?style=flat-square)
 ![Python](https://img.shields.io/pypi/pyversions/fastapi-sa)
 ![PyPI](https://img.shields.io/pypi/v/fastapi-sa?style=flat-square)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/c76cfa7d7d274f899967019900465403)](https://www.codacy.com/gh/whg517/fastapi-sa/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=whg517/fastapi-sa&amp;utm_campaign=Badge_Grade)
-[![codecov](https://codecov.io/gh/whg517/fastapi-sa/branch/main/graph/badge.svg?token=F098K6GGGC)](https://codecov.io/gh/whg517/fastapi-sa)
+[![codecov](https://codecov.io/gh/whg517/fastapi-sa/graph/badge.svg?token=F098K6GGGC)](https://codecov.io/gh/whg517/fastapi-sa)
 
 fastapi-sa provides a simple integration between FastAPI and SQLAlchemy in your application.
 you can use decorators or middleware to transaction management.

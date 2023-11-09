@@ -16,12 +16,12 @@ class UserRepository:
     async def get_all(self):
         """get all"""
         result = await db.session.scalars(select(self.model))
-        objs = [UserSchema.from_orm(i) for i in result.all()]
+        objs = [UserSchema.model_validate(i) for i in result.all()]
         return objs
 
     async def create(self, obj_in: UserCreate):
         """create"""
-        obj = self.model(**obj_in.dict())
+        obj = self.model(**obj_in.model_dump())
         db.session.add(obj)
         await db.session.flush()
-        return UserSchema.from_orm(obj)
+        return UserSchema.model_validate(obj)
